@@ -39,12 +39,16 @@ class ClientServer:
                 await client.writer.drain()
 
     async def _handle(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
+        print('New client', writer.get_extra_info('peername'))
+
         client = Client(reader, writer)
         self.clients.append(client)
         await self._serve_client(client)
         self.clients.remove(client)
         client.writer.close()
         await client.writer.wait_closed()
+
+        print('Removed client', writer.get_extra_info('peername'))
 
     async def _serve_client(self, client: Client):
         while True:
